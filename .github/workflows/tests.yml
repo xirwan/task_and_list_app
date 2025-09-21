@@ -1,18 +1,18 @@
-name: tests
-
-on:
-  push:
-    branches:
-      - develop
-      - main
-  pull_request:
-    branches:
-      - develop
-      - main
-
 jobs:
   ci:
     runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: your_db_name
+          MYSQL_USER: your_db_user
+          MYSQL_PASSWORD: your_db_password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping --silent" --health-start-period=10s --health-interval=5s --health-timeout=5s --health-retries=5
 
     steps:
       - name: Checkout
@@ -40,15 +40,26 @@ jobs:
       - name: Copy Environment File
         run: cp .env.example .env
 
+      - name: Update .env for MySQL Connection
+        run: |
+          echo "DB_CONNECTION=mysql" >> .env
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_PORT=3306" >> .env
+          echo "DB_DATABASE=your_db_name" >> .env
+          echo "DB_USERNAME=your_db_user" >> .env
+          echo "DB_PASSWORD=your_db_password" >> .env
+
       - name: Generate Application Key
         run: php artisan key:generate
+
+      - name: Migrate Database
+        run: php artisan migrate --force
 
       - name: Run Wayfinder Generate Command
         run: php artisan wayfinder:generate --with-form
 
       - name: Build Assets
         run: npm run build
-
 
       - name: Tests
         run: ./vendor/bin/pest
