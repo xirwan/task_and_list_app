@@ -132,7 +132,7 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props){
     };
 
     const handleDelete = (taskId: number) => {
-        destory(route('tasks.destroy', taskId));
+        destory(route('tasks.destory', taskId));
     };
 
     const handleSeacrh = (e: React.FormEvent<HTMLFormElement>) => {
