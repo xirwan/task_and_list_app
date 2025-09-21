@@ -16,7 +16,6 @@ abstract class TestCase extends BaseTestCase
         // Keep session middleware but disable CSRF
         $this->withoutMiddleware([
             'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken',
-            'App\Http\Middleware\VerifyCsrfToken',
         ]);
     }
 }
