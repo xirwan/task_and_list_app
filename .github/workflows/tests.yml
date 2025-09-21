@@ -18,6 +18,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+        # TAMBAHKAN LANGKAH INI DI BAWAH CHECKOUT
       - name: Verify generated files exist
         run: |
           echo "Checking contents of resources/js..."
