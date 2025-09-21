@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -11,10 +12,11 @@ abstract class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        // Disable ALL middleware untuk testing
-        $this->withoutMiddleware();
         
-        // Show detailed errors in tests
-        $this->withoutExceptionHandling();
+        // Keep session middleware but disable CSRF
+        $this->withoutMiddleware([
+            'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken',
+            'App\Http\Middleware\VerifyCsrfToken',
+        ]);
     }
 }
