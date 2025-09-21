@@ -2,9 +2,7 @@
 
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken; // 1. Tambahkan ini di atas
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Password;
 
 test('reset password link screen can be rendered', function () {
     $response = $this->get(route('password.request'));
@@ -13,7 +11,6 @@ test('reset password link screen can be rendered', function () {
 });
 
 test('reset password link can be requested', function () {
-    $this->withoutMiddleware(VerifyCsrfToken::class); // <-- Ditambahkan di sini
     Notification::fake();
 
     $user = User::factory()->create();
@@ -24,35 +21,45 @@ test('reset password link can be requested', function () {
 });
 
 test('reset password screen can be rendered', function () {
+    Notification::fake();
+
     $user = User::factory()->create();
-    $token = Password::createToken($user);
 
-    $response = $this->get(route('password.reset', ['token' => $token, 'email' => $user->email]));
+    $this->post(route('password.email'), ['email' => $user->email]);
 
-    $response->assertStatus(200);
+    Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
+        $response = $this->get(route('password.reset', $notification->token));
+
+        $response->assertStatus(200);
+
+        return true;
+    });
 });
 
 test('password can be reset with valid token', function () {
-    $this->withoutMiddleware(VerifyCsrfToken::class); // <-- Ditambahkan di sini
+    Notification::fake();
 
     $user = User::factory()->create();
-    $token = Password::createToken($user);
 
-    $response = $this->post(route('password.store'), [
-        'token' => $token,
-        'email' => $user->email,
-        'password' => 'password',
-        'password_confirmation' => 'password',
-    ]);
+    $this->post(route('password.email'), ['email' => $user->email]);
 
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect(route('login'));
+    Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
+        $response = $this->post(route('password.store'), [
+            'token' => $notification->token,
+            'email' => $user->email,
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('login'));
+
+        return true;
+    });
 });
 
 test('password cannot be reset with invalid token', function () {
-    $this->withoutMiddleware(VerifyCsrfToken::class); // <-- Ditambahkan di sini
-
     $user = User::factory()->create();
 
     $response = $this->post(route('password.store'), [

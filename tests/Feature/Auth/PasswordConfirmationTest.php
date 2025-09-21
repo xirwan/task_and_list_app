@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken; // 1. Tambahkan ini
 
 test('confirm password screen can be rendered', function () {
     $user = User::factory()->create();
@@ -12,11 +11,9 @@ test('confirm password screen can be rendered', function () {
 });
 
 test('password can be confirmed', function () {
-    $this->withoutMiddleware(VerifyCsrfToken::class); // <-- Ditambahkan di sini
-
     $user = User::factory()->create();
 
-    $response = $this->actingAs($user)->post(route('password.confirm'), [
+    $response = $this->actingAs($user)->post(route('password.confirm.store'), [
         'password' => 'password',
     ]);
 
@@ -25,11 +22,9 @@ test('password can be confirmed', function () {
 });
 
 test('password is not confirmed with invalid password', function () {
-    $this->withoutMiddleware(VerifyCsrfToken::class); // <-- Ditambahkan di sini
-
     $user = User::factory()->create();
 
-    $response = $this->actingAs($user)->post(route('password.confirm'), [
+    $response = $this->actingAs($user)->post(route('password.confirm.store'), [
         'password' => 'wrong-password',
     ]);
 

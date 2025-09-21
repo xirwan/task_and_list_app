@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken; // 1. Tambahkan ini
-
 test('registration screen can be rendered', function () {
     $response = $this->get(route('register'));
 
@@ -9,9 +7,7 @@ test('registration screen can be rendered', function () {
 });
 
 test('new users can register', function () {
-    $this->withoutMiddleware(VerifyCsrfToken::class); // <-- Ditambahkan di sini
-
-    $response = $this->post(route('register'), [
+    $response = $this->post(route('register.store'), [
         'name' => 'Test User',
         'email' => 'test@example.com',
         'password' => 'password',
