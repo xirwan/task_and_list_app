@@ -1,8 +1,10 @@
 # task_and_list_app
-<div style="text-align: center; mt: 10px; background-color: white; color: black;">
+<p align="center">
     <img src="readmeimg/logo.svg" alt="logo">
-    <p>Task and List App</p>
-</div>
+</p>
+<p align="center">
+    Task and List App
+</p>
 
 
 ## Landing Page
